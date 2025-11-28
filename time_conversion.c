@@ -1,63 +1,69 @@
 #include <stdio.h>
+#include <string.h>
 int main()
 {
-	int i,j,n;
-	int temp;
-	printf("Enter size of array: ");
+	//Code for time conversion
+
+	//Asking user for time
+	char time12[50];
+	printf("Enter the time in 12hr format (hh:mm:ss AM/PM): ");
 	fflush(stdout);
-	scanf("%d",&n);
+	fgets(time12, sizeof(time12), stdin);
 
-	if(0<n && n<=1000000)
+	//removing new line character from fgets
+	time12[strcspn(time12, "\n")]='\0';
+
+    //defining strings
+	char first2[3], last2[3];
+	int len = strlen(time12);
+
+	//Assigning values
+	first2[0]=time12[0];
+	first2[1]=time12[1];
+	first2[2]='\0';
+    last2[0]=time12[len-2];
+	last2[1]=time12[len-1];
+	last2[2]='\0';
+
+	//Applying conditions
+	if(strcmp(first2, "12")==0 && strcmp(last2, "AM")==0)
 	{
-		int arr[n];
-		printf("Enter array elements\n");
-		for(i=0;i<n;i++)
-		{
-			printf("arr[%d]: ",i);
-			fflush(stdout);
-			scanf("%d",&arr[i]);
-		}
-
-		for(i=0;i<n;i++)
-		{
-			for(j=0;j<i;j++)
-			{
-			    if(arr[i]<arr[j])
-			    {
-			    	temp = arr[i];
-			    	arr[i]=arr[j];
-			    	arr[j]=temp;
-			    }
-			}
-		}
-
-	    int key;
-	    printf("Enter key to be searched");
-	    fflush(stdout);
-	    scanf("%d",&key);
-
-	    int max=n-1;
-	    int min=0;
-	    int found=0;
-		while(min<=max)
-		{
-	      int mid= (max+min)/2;
-	      if(arr[mid]==key)
-	      {
-	          printf("Number found at %d position",mid);
-	          found = 1;
-	          break;
-	      }
-
-	      else if(arr[mid]<key)
-	    	  min = mid+1;
-	      else
-	    	  max = mid - 1;
-		}
-		if(found!=1)
-			printf("Element not found");
+		strcpy(first2, "00");
+		time12[0]=first2[0];
+	    time12[1]=first2[1];
+	    printf("\nTime in 24hr format is %s",time12);
 	}
-	else
-		printf("Not acceptable");
+	else if(strcmp(first2, "12")!=0 && strcmp(last2, "PM")==0)
+	{
+         if(strcmp(first2, "01")==0)
+    		 strcpy(first2, "13") ;
+         else if(strcmp(first2, "02")==0)
+             strcpy(first2, "14") ;
+         else if(strcmp(first2, "03")==0)
+             strcpy(first2, "15") ;
+         else if(strcmp(first2, "04")==0)
+             strcpy(first2, "16") ;
+         else if(strcmp(first2, "05")==0)
+             strcpy(first2, "17") ;
+         else if(strcmp(first2, "06")==0)
+             strcpy(first2, "18") ;
+         else if(strcmp(first2, "07")==0)
+              strcpy(first2, "19") ;
+         else if(strcmp(first2, "08")==0)
+              strcpy(first2, "20") ;
+         else if(strcmp(first2, "09")==0)
+              strcpy(first2, "21") ;
+         else if(strcmp(first2, "10")==0)
+              strcpy(first2, "22") ;
+         else if(strcmp(first2, "11")==0)
+              strcpy(first2, "23") ;
+
+     	time12[0]=first2[0];
+        time12[1]=first2[1];
+        printf("\nTime in 24hr format is %s",time12);
+     }
+
+
 return 0;
 }
+
