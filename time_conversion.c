@@ -1,67 +1,143 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+char* readline();
+
+/*
+ * Complete the 'timeConversion' function below.
+ *
+ * The function is expected to return a STRING.
+ * The function accepts STRING s as parameter.
+ */
+
+/*
+ * To return the string from the function, you should either do static allocation or dynamic allocation
+ *
+ * For example,
+ * char* return_string_using_static_allocation() {
+ *     static char s[] = "static allocation of string";
+ *
+ *     return s;
+ * }
+ *
+ * char* return_string_using_dynamic_allocation() {
+ *     char* s = malloc(100 * sizeof(char));
+ *
+ *     s = "dynamic allocation of string";
+ *
+ *     return s;
+ * }
+ *
+ */
+char* timeConversion(char* s) {
+
+    static char result[20];   // HackerRank allows static here to return string
+
+    char hour[3];
+    char period[3];
+
+    // extract hour
+    hour[0] = s[0];
+    hour[1] = s[1];
+    hour[2] = '\0';
+
+    // extract AM or PM
+    period[0] = s[8];
+    period[1] = s[9];
+    period[2] = '\0';
+
+    // Convert hour
+    if (strcmp(hour, "12") == 0 && strcmp(period, "AM") == 0) {
+        strcpy(hour, "00");
+    }
+    else if (strcmp(period, "PM") == 0 && strcmp(hour, "12") != 0) {
+        int h = (hour[0] - '0') * 10 + (hour[1] - '0');
+        h = h + 12;
+        sprintf(hour, "%d", h);   // convert back to string
+    }
+
+    // build final string (WITHOUT AM/PM)
+    sprintf(result, "%s:%c%c:%c%c", 
+            hour, s[3], s[4], s[6], s[7]);
+
+    return result;
+}
+
 int main()
 {
-	//Code for time conversion
+    FILE* fptr = fopen(getenv("OUTPUT_PATH"), "w");
 
-	//Asking user for time
-	char time12[50];
-	printf("Enter the time in 12hr format (hh:mm:ss AM/PM): ");
-	fflush(stdout);
-	fgets(time12, sizeof(time12), stdin);
+    char* s = readline();
 
-	//removing new line character from fgets
-	time12[strcspn(time12, "\n")]='\0';
+    char* result = timeConversion(s);
 
-    //defining strings
-	char first2[3], last2[3];
-	int len = strlen(time12);
+    fprintf(fptr, "%s\n", result);
 
-	//Assigning values
-	first2[0]=time12[0];
-	first2[1]=time12[1];
-	first2[2]='\0';
-    last2[0]=time12[len-2];
-	last2[1]=time12[len-1];
-	last2[2]='\0';
+    fclose(fptr);
 
-	//Applying conditions
-	if(strcmp(first2, "12")==0 && strcmp(last2, "AM")==0)
-	{
-		strcpy(first2, "00");
-		time12[0]=first2[0];
-	    time12[1]=first2[1];
-	    printf("\nTime in 24hr format is %s",time12);
-	}
-	else if(strcmp(first2, "12")!=0 && strcmp(last2, "PM")==0)
-	{
-         if(strcmp(first2, "01")==0)
-    		 strcpy(first2, "13") ;
-         else if(strcmp(first2, "02")==0)
-             strcpy(first2, "14") ;
-         else if(strcmp(first2, "03")==0)
-             strcpy(first2, "15") ;
-         else if(strcmp(first2, "04")==0)
-             strcpy(first2, "16") ;
-         else if(strcmp(first2, "05")==0)
-             strcpy(first2, "17") ;
-         else if(strcmp(first2, "06")==0)
-             strcpy(first2, "18") ;
-         else if(strcmp(first2, "07")==0)
-              strcpy(first2, "19") ;
-         else if(strcmp(first2, "08")==0)
-              strcpy(first2, "20") ;
-         else if(strcmp(first2, "09")==0)
-              strcpy(first2, "21") ;
-         else if(strcmp(first2, "10")==0)
-              strcpy(first2, "22") ;
-         else if(strcmp(first2, "11")==0)
-              strcpy(first2, "23") ;
+    return 0;
+}
 
-     	time12[0]=first2[0];
-        time12[1]=first2[1];
-        printf("\nTime in 24hr format is %s",time12);
-     }
+char* readline() {
+    size_t alloc_length = 1024;
+    size_t data_length = 0;
+
+    char* data = malloc(alloc_length);
+
+    while (true) {
+        char* cursor = data + data_length;
+        char* line = fgets(cursor, alloc_length - data_length, stdin);
+
+        if (!line) {
+            break;
+        }
+
+        data_length += strlen(cursor);
+
+        if (data_length < alloc_length - 1 || data[data_length - 1] == '\n') {
+            break;
+        }
+
+        alloc_length <<= 1;
+
+        data = realloc(data, alloc_length);
+
+        if (!data) {
+            data = '\0';
+
+            break;
+        }
+    }
+
+    if (data[data_length - 1] == '\n') {
+        data[data_length - 1] = '\0';
+
+        data = realloc(data, data_length);
+
+        if (!data) {
+            data = '\0';
+        }
+    } else {
+        data = realloc(data, data_length + 1);
+
+        if (!data) {
+            data = '\0';
+        } else {
+            data[data_length] = '\0';
+        }
+    }
+
+    return data;
+}
+
 
 
 return 0;
