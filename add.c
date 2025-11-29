@@ -1,61 +1,178 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char* readline();
+char* ltrim(char*);
+char* rtrim(char*);
+char** split_string(char*);
+
+int parse_int(char*);
+
+/*
+ * Complete the 'simpleArraySum' function below.
+ *
+ * The function is expected to return an INTEGER.
+ * The function accepts INTEGER_ARRAY ar as parameter.
+ */
+
+int simpleArraySum(int ar_count, int* ar) {
+     int sum = 0;
+    for (int i = 0; i < ar_count; i++) {
+        sum += ar[i];  // add each element
+    }
+    return sum;
+}
+
 int main()
 {
-	int n,i;
-	//User input for array size
-	printf("Enter size of the array: ");
-	fflush(stdout);
-	scanf("%d",&n);
-	int arr[n];
-	int count=0;
-	int valid=1;
+    FILE* fptr = fopen(getenv("OUTPUT_PATH"), "w");
 
-	if(n<0 || n>1000)
-	{
-	    printf("Invalid! Enter value between 1 and 1000 ");
-	    return 0;
-	}
+    int ar_count = parse_int(ltrim(rtrim(readline())));
 
-	else
-	{
-		//User input for array elements
-		printf("Enter elements of array\n");
-		for(i=0;i<n;i++)
-		{
-			printf("Enter a[%d]",i);
-			fflush(stdout);
-			scanf("%d",&arr[i]);
+    char** ar_temp = split_string(rtrim(readline()));
 
-			if(arr[i]<=0 || arr[i]>1000)
-			{
-				valid=0;
-			}
-		}
+    int* ar = malloc(ar_count * sizeof(int));
 
-		if(valid==0)
-		{
-			printf("Enter value greater than 0 and less than or equal to 1000");
-		    return 0;
-	     }
+    for (int i = 0; i < ar_count; i++) {
+        int ar_item = parse_int(*(ar_temp + i));
 
-		else
-		{
-			//printing array elements
-		     printf("Your array is: ");
-			 for(i=0;i<n;i++)
-			 {
-			  printf("\t%d",arr[i]);
-			 }
-			 //to add elements of array
-			 for(i=0;i<n;i++)
-			 {
-				count = count + arr[i];
-			 }
-			 printf("\nAddition of elements is %d",count);
-	     }
+        *(ar + i) = ar_item;
+    }
 
+    int result = simpleArraySum(ar_count, ar);
 
-	 }
-	return 0;
+    fprintf(fptr, "%d\n", result);
+
+    fclose(fptr);
+
+    return 0;
 }
+
+char* readline() {
+    size_t alloc_length = 1024;
+    size_t data_length = 0;
+
+    char* data = malloc(alloc_length);
+
+    while (true) {
+        char* cursor = data + data_length;
+        char* line = fgets(cursor, alloc_length - data_length, stdin);
+
+        if (!line) {
+            break;
+        }
+
+        data_length += strlen(cursor);
+
+        if (data_length < alloc_length - 1 || data[data_length - 1] == '\n') {
+            break;
+        }
+
+        alloc_length <<= 1;
+
+        data = realloc(data, alloc_length);
+
+        if (!data) {
+            data = '\0';
+
+            break;
+        }
+    }
+
+    if (data[data_length - 1] == '\n') {
+        data[data_length - 1] = '\0';
+
+        data = realloc(data, data_length);
+
+        if (!data) {
+            data = '\0';
+        }
+    } else {
+        data = realloc(data, data_length + 1);
+
+        if (!data) {
+            data = '\0';
+        } else {
+            data[data_length] = '\0';
+        }
+    }
+
+    return data;
 }
+
+char* ltrim(char* str) {
+    if (!str) {
+        return '\0';
+    }
+
+    if (!*str) {
+        return str;
+    }
+
+    while (*str != '\0' && isspace(*str)) {
+        str++;
+    }
+
+    return str;
+}
+
+char* rtrim(char* str) {
+    if (!str) {
+        return '\0';
+    }
+
+    if (!*str) {
+        return str;
+    }
+
+    char* end = str + strlen(str) - 1;
+
+    while (end >= str && isspace(*end)) {
+        end--;
+    }
+
+    *(end + 1) = '\0';
+
+    return str;
+}
+
+char** split_string(char* str) {
+    char** splits = NULL;
+    char* token = strtok(str, " ");
+
+    int spaces = 0;
+
+    while (token) {
+        splits = realloc(splits, sizeof(char*) * ++spaces);
+
+        if (!splits) {
+            return splits;
+        }
+
+        splits[spaces - 1] = token;
+
+        token = strtok(NULL, " ");
+    }
+
+    return splits;
+}
+
+int parse_int(char* str) {
+    char* endptr;
+    int value = strtol(str, &endptr, 10);
+
+    if (endptr == str || *endptr != '\0') {
+        exit(EXIT_FAILURE);
+    }
+
+    return value;
+}
+
